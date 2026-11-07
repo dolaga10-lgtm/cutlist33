@@ -1,0 +1,62 @@
+name: Build & Release APK - كات ليست محمد عادل
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write   # صلاحية إنشاء وتحديث الـ Release تلقائياً
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Build Release & Debug APK
+        run: gradle assembleRelease assembleDebug --no-daemon --stacktrace
+
+      - name: Prepare APK files
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/release/app-release.apk "dist/CutList-Mohamed-Adel-Release.apk"
+          cp app/build/outputs/apk/release/app-release.apk "dist/CutList-Mohamed-Adel.apk"
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CutList-Mohamed-Adel-apk
+          path: |
+            dist/CutList-Mohamed-Adel-Release.apk
+            dist/CutList-Mohamed-Adel.apk
+
+      - name: Auto-Publish GitHub Release
+        if: github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.126-latest' }}
+          name: "كات ليست محمد عادل - نسخة الـ APK الجاهزة (v1.126)"
+          body: |
+            نسخة **Release APK** مبنية وموقعة تلقائياً وجاهزة للتثبيت المباشر على الأندرويد:
+            - **CutList-Mohamed-Adel-Release.apk**
+          draft: false
+          prerelease: false
+          make_latest: true
+          files: |
+            dist/CutList-Mohamed-Adel-Release.apk
+            dist/CutList-Mohamed-Adel.apk
