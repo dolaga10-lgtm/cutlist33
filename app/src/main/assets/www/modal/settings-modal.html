@@ -1,0 +1,111 @@
+<div class="modal fade" id="settingsModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h3 class="modal-title" id="settingsModalLabel">{{ 'SETTINGS' | translate }}</h3>
+            </div>
+            <div class="modal-body">
+
+                <div class="form-horizontal">
+                    <div id="language-setting" class="form-group">
+                        <div class="col-xs-6">
+                            <label class="control-label" style="padding-top: 6px">{{ 'LANGUAGE' | translate }}</label>
+                        </div>
+                        <div class="col-xs-6">
+                            <select class="form-control" ng-options="option as option.label for option in languageList" ng-model="$parent.language" ng-change="onLanguageChanged()"></select>
+                        </div>
+                    </div>
+
+                    <div id="unit-setting" class="form-group">
+                        <div class="col-xs-6">
+                            <label class="control-label" style="padding-top: 6px">{{ 'UNITS' | translate }}</label>
+                        </div>
+                        <div class="col-xs-6">
+                            <select class="form-control" ng-options="option.id as option.label for option in unitsList" ng-model="$parent.cfg.units" ng-change="$parent.setupUnits()"></select>
+                        </div>
+                    </div>
+
+                    <div id="widht-1st-setting" class="form-group">
+                        <div class="col-xs-6">
+                            <label class="control-label" style="padding-top: 6px">{{ 'WIDTH_1ST' | translate }}</label>
+                        </div>
+                        <div class="col-xs-6">
+                            <select class="form-control" ng-options="option.id as option.label for option in cutDimensionsRepresentationList" ng-model="$parent.cfg.isWidthFirst"></select>
+                        </div>
+                    </div>
+
+                    <div id="decimal-places-setting" class="form-group" ng-show="!dimensionProcessor.isUnitFractional($parent.cfg.units)">
+                        <div class="col-xs-6">
+                            <label class="control-label" style="padding-top: 6px">{{ 'DECIMAL_PLACES' | translate }}</label>
+                        </div>
+                        <div class="col-xs-6">
+                            <select class="form-control" ng-options="n as n for n in decimalPlacesList" ng-model="$parent.cfg.decimalPlaces"></select>
+                        </div>
+                    </div>
+
+                    <div id="fraction-precision-setting" class="form-group" ng-show="dimensionProcessor.isUnitFractional($parent.cfg.units)">
+                        <div class="col-xs-6">
+                            <label class="control-label" style="padding-top: 6px">{{ 'FRACTION_PRECISION' | translate }}</label>
+                        </div>
+                        <div class="col-xs-6">
+                            <select class="form-control" ng-options="option.id as option.label for option in fractionPrecisionList" ng-model="$parent.cfg.fractionPrecision" ng-change="$parent.onFractionPrecisionChanged()"></select>
+                        </div>
+                    </div>
+
+                    <div id="group-equal-mosaics-setting" class="form-group">
+                        <div class="col-xs-6">
+                            <label class="control-label" style="padding-top: 6px">{{ 'GROUP_EQUAL_MOSAICS' | translate }}</label>
+                        </div>
+                        <div class="col-xs-6">
+                            <select class="form-control" ng-options="option.id as option.label for option in stackEqualMosaicsOptionsList" ng-model="$parent.cfg.stackEqualMosaicLayout"></select>
+                        </div>
+                    </div>
+
+                    <div id="optimization-priority-setting" class="form-group">
+                        <div class="col-xs-6">
+                            <label class="control-label" style="padding-top: 6px">{{ 'OPTIMIZATION_PRIORITY' | translate }}</label>
+                            <div ng-if="!hasPremiumFeatures()" ng-click="validateSubscriptionFeature()" class="pro-only"><small>{{ 'PRO_FEATURE' | translate }}</small></div>
+                        </div>
+                        <div class="col-xs-6">
+                            <select class="form-control" ng-disabled="!hasPremiumFeatures()" ng-options="option.id as option.label for option in optimizationFactorPriority" ng-model="$parent.cfg.optimizationPriority"></select>
+                        </div>
+                    </div>
+
+                    <div id="cut-orientation-preference-setting" class="form-group">
+                        <div class="col-xs-6">
+                            <label class="control-label" style="padding-top: 6px">{{ 'CUT_ORIENTATION_PREFERENCE' | translate }}</label>
+                            <div ng-if="!hasPremiumFeatures()" ng-click="validateSubscriptionFeature()" class="pro-only"><small>{{ 'PRO_FEATURE' | translate }}</small></div>
+                        </div>
+                        <div class="col-xs-6">
+                            <select class="form-control" ng-disabled="!hasPremiumFeatures()" ng-options="option.id as option.label for option in cutOrientationPreferenceList" ng-model="$parent.cfg.cutOrientationPreference"></select>
+                        </div>
+                    </div>
+
+                    <div id="minimum-trim-setting" class="form-group">
+                        <div class="col-xs-6">
+                            <label class="control-label" style="padding-top: 6px">{{ 'MINIMUM_TRIM_DIMENSION' | translate }}</label>
+                        </div>
+                        <div class="col-xs-6">
+                            <input type="text" class="form-control" ng-model="$parent.cfg.minTrimDimension">
+                        </div>
+                    </div>
+
+                    <div id="edge-trim-setting" class="form-group">
+                        <div class="col-xs-6">
+                            <label class="control-label" style="padding-top: 6px">{{ 'EDGE_TRIM' | translate }}</label>
+                        </div>
+                        <div class="col-xs-6">
+                            <input type="text" class="form-control" ng-model="$parent.cfg.edgeTrim">
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button style="width: 70px;" type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
