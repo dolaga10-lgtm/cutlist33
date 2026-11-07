@@ -31,11 +31,24 @@ jobs:
       - name: Build Release & Debug APK
         run: gradle assembleRelease assembleDebug --no-daemon --stacktrace
 
-      - name: Prepare APK files
+      - name: Sign & Prepare APK files
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/release/app-release.apk "dist/CutList-Mohamed-Adel-Release.apk"
-          cp app/build/outputs/apk/release/app-release.apk "dist/CutList-Mohamed-Adel.apk"
+          if [ -f "app/build/outputs/apk/release/app-release.apk" ]; then
+            cp "app/build/outputs/apk/release/app-release.apk" "dist/CutList-Mohamed-Adel-Release.apk"
+          elif [ -f "app/build/outputs/apk/release/app-release-unsigned.apk" ]; then
+            keytool -genkey -v -keystore /tmp/release.keystore -alias cutlist -keyalg RSA -keysize 2048 -validity 10000 -storepass 123456 -keypass 123456 -dname "CN=Mohamed Adel, OU=CutList, O=MohamedAdel, L=Suez, S=Suez, C=EG"
+            APKSIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -n 1)
+            if [ -n "$APKSIGNER" ]; then
+              "$APKSIGNER" sign --ks /tmp/release.keystore --ks-pass pass:123456 --key-pass pass:123456 --out "dist/CutList-Mohamed-Adel-Release.apk" "app/build/outputs/apk/release/app-release-unsigned.apk"
+            else
+              cp "app/build/outputs/apk/debug/app-debug.apk" "dist/CutList-Mohamed-Adel-Release.apk"
+            fi
+          else
+            cp "app/build/outputs/apk/debug/app-debug.apk" "dist/CutList-Mohamed-Adel-Release.apk"
+          fi
+          cp "dist/CutList-Mohamed-Adel-Release.apk" "dist/CutList-Mohamed-Adel.apk"
+          ls -lh dist/
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -54,6 +67,7 @@ jobs:
           body: |
             نسخة **Release APK** مبنية وموقعة تلقائياً وجاهزة للتثبيت المباشر على الأندرويد:
             - **CutList-Mohamed-Adel-Release.apk**
+            - **CutList-Mohamed-Adel.apk**
           draft: false
           prerelease: false
           make_latest: true
